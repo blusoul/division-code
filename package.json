@@ -1,0 +1,29 @@
+{
+  "name": "division-code",
+  "version": "1.0.0",
+  "description": "Administrative division codes of China -- 中国行政区划代码",
+  "main": "index.js",
+  "scripts": {
+    "start:official": "node official/index.js",
+    "start:unofficial": "node unofficial/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blusoul/division-code.git"
+  },
+  "keywords": [
+    "division-code",
+    "区划代码"
+  ],
+  "author": "blusoul",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blusoul/division-code/issues"
+  },
+  "homepage": "https://github.com/blusoul/division-code#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "iconv-lite": "^0.4.17",
+    "request": "^2.81.0"
+  }
+}
