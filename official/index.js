@@ -72,12 +72,12 @@ function parseHtml(str) {
                         cityCode = zoningCode;
                         setCode.setCityCode();
                     }
-                } else if (zoningCode.substr(-2) == 0) {
+                } else if (zoningCode.substr(4, 6) === '00') {
                     // 市级区划代码最后两位都是 0 比如： 130100 石家庄市
                     cityCode = zoningCode;
                     setCode.setCityCode();
                 } else {
-                    if (zoningCode.charAt(2) == 9) {
+                    if (zoningCode.substr(2, 4) === '90') {
                         // 省直辖县级行政区划 或 自治区直辖县级行政区划 的代码 第三四位为 90 比如 659001 石河子市 429004 仙桃市
                         // 此类市没有下一级目录，需要自己添加
                         setCode.setCityCode();
