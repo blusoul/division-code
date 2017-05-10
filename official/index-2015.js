@@ -3,7 +3,6 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const iconv = require('iconv-lite');
 const async = require('async');
-const _ = require('lodash');
 
 const entryUrl = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2015/index.html';
 const writeJSON = fs.createWriteStream(__dirname + '/data/list-2015.json');
@@ -28,15 +27,15 @@ const parseHtml = {
 
     linkList.map((index, item) => {
       const $item = $(item);
-      if (index < 3) {
-        provinceArr.push({
-          url: combineLink({
-            originUrl: entryUrl,
-            spliceUrl: $item.attr('href')
-          }),
-          name: $item.text().trim()
-        });
-      }
+      // if (index < 3) {
+      provinceArr.push({
+        url: combineLink({
+          originUrl: entryUrl,
+          spliceUrl: $item.attr('href')
+        }),
+        name: $item.text().trim()
+      });
+      // }
 
     });
     return provinceArr;
@@ -53,7 +52,7 @@ const parseHtml = {
       const url = linkNodes.eq(0).find('a').attr('href');
 
       if (!provinceCode) {
-        provinceCode = code.substr(0, 2) + '0000000000';
+        provinceCode = code.substr(0, 2) + '0000000';
         listJSON[provinceCode] = $.provinceName;
       }
 
@@ -73,7 +72,7 @@ const parseHtml = {
 
     cityList.map((index, item) => {
       const linkNodes = $(item).find('td');
-      const code = linkNodes.eq(0).text().trim();
+      const code = linkNodes.eq(0).text().trim().substr(0, 9);
       const name = linkNodes.eq(1).text().trim();
       const url = linkNodes.eq(0).find('a').attr('href');
 
@@ -93,7 +92,7 @@ const parseHtml = {
 
     cityList.map((index, item) => {
       const linkNodes = $(item).find('a');
-      const code = linkNodes.eq(0).text().trim();
+      const code = linkNodes.eq(0).text().trim().substr(0, 9);
       const name = linkNodes.eq(1).text().trim();
 
       listJSON[code] = name;
@@ -116,20 +115,26 @@ const parseHtml = {
           tempArr = tempArr.concat(this.captureCity(item, item.href))
         });
 
-        async.mapLimit(tempArr, 10, function (item, callback) {
-          let temp = [];
-          captureUrl(item, function ($) {
-            console.log(item)
-            temp = temp.concat(parseHtml.captureCountry($));
-            callback(null, temp);
-          });
-        }, function (err, result) {
-          let tempArr = [];
-          result.map(item => {
-            tempArr = tempArr.concat(item);
-          });
-
+        return new Promise((resolve, reject) => {
           async.mapLimit(tempArr, 10, function (item, callback) {
+            let temp = [];
+            captureUrl(item, function ($) {
+              console.log(item)
+              temp = temp.concat(parseHtml.captureCountry($));
+              callback(null, temp);
+            });
+          }, function (err, result) {
+            let tempArr = [];
+            result.map(item => {
+              tempArr = tempArr.concat(item);
+            });
+            resolve(tempArr);
+          });
+        });
+
+      }).then(res => {
+        return new Promise((resolve, reject) => {
+          async.mapLimit(res, 10, function (item, callback) {
             let temp = [];
             captureUrl(item, function ($) {
               console.log(item)
@@ -137,10 +142,14 @@ const parseHtml = {
               callback(null, temp);
             });
           }, function (err, result) {
-            writeJSON.write(JSON.stringify(listJSON));
-            console.log('区划信息写入成功~')
+            resolve(true)
           });
         });
+      }).then(res => {
+        console.log('区划信息写入成功~')
+        writeJSON.write(JSON.stringify(listJSON));
+      }).catch(err => {
+        console.log(err)
       });
   }
 };
