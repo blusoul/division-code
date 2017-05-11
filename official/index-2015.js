@@ -26,8 +26,8 @@ const parseHtml = {
     let provinceArr = [];
 
     linkList.map((index, item) => {
+      // if (index < 10) {
       const $item = $(item);
-      // if (index < 3) {
       provinceArr.push({
         url: combineLink({
           originUrl: entryUrl,
@@ -36,7 +36,6 @@ const parseHtml = {
         name: $item.text().trim()
       });
       // }
-
     });
     return provinceArr;
   },
@@ -56,7 +55,9 @@ const parseHtml = {
         listJSON[provinceCode] = $.provinceName;
       }
 
-      listJSON[code] = name;
+      if (!/(市辖区|县|省直辖县级行政区划|自治区直辖县级行政区划)/.test(name)) {
+        listJSON[code] = name;
+      }
       cityUrlArr.push(combineLink({
         originUrl: $.href,
         spliceUrl: url
@@ -76,7 +77,9 @@ const parseHtml = {
       const name = linkNodes.eq(1).text().trim();
       const url = linkNodes.eq(0).find('a').attr('href');
 
-      listJSON[code] = name;
+      if (!/市辖区/.test(name)) {
+        listJSON[code] = name;
+      }
       if (url) {
         areaUrlArr.push(combineLink({
           originUrl: $.href,
@@ -97,6 +100,7 @@ const parseHtml = {
 
       listJSON[code] = name;
     });
+    return true;
   },
   deal(res, entryUrl) {
     let i = 0;
@@ -105,7 +109,7 @@ const parseHtml = {
     Promise.all(provinceArr.map(item => {
         const provinceName = item.name;
         const provinceUrl = item.url;
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           captureUrl(provinceUrl, resolve, provinceName);
         })
       }))
@@ -115,7 +119,7 @@ const parseHtml = {
           tempArr = tempArr.concat(this.captureCity(item, item.href))
         });
 
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           async.mapLimit(tempArr, 10, function (item, callback) {
             let temp = [];
             captureUrl(item, function ($) {
@@ -133,7 +137,7 @@ const parseHtml = {
         });
 
       }).then(res => {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           async.mapLimit(res, 10, function (item, callback) {
             let temp = [];
             captureUrl(item, function ($) {
@@ -169,7 +173,7 @@ function captureUrl(url, fn, provinceName) {
       fn($);
     }
     if (error) {
-      console.log(url)
+      console.log('error: ' + url)
     }
   });
 }

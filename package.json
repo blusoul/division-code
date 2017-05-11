@@ -4,10 +4,10 @@
   "description": "Administrative division codes of China -- 中国行政区划代码",
   "main": "index.js",
   "scripts": {
-    "start:official": "node official/index.js",
     "start:official-2013": "node official/index-2013.js",
     "start:official-2015": "node official/index-2015.js",
     "start:official-2017": "node official/index-2017.js",
+    "start:official-update": "node official/update.js",
     "start:unofficial": "node unofficial/index.js"
   },
   "repository": {
