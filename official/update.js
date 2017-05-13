@@ -3,6 +3,7 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 const iconv = require('iconv-lite');
 const async = require('async');
+const path = require('path');
 
 let updateUrlArr = [];
 let len = 0;
@@ -13,7 +14,7 @@ const originData = {};
 const writeJSON = fs.createWriteStream(__dirname + '/data/list-update.json');
 
 // 待写入的JSON数据
-let listJSON = {};
+let listJSON = JSON.parse(fs.readFileSync(path.join(__dirname + '/data/list-2015.json'), 'utf8'));
 
 function combineLink({
     originUrl,
@@ -31,7 +32,7 @@ const parseHtml = {
         trList.map((index, item) => {
             const tdList = $(item).find('td');
             const trList = this.getInnerText(tdList);
-            if (parseInt(trList(0), 10)) {
+            if (+trList(0)) {
 
                 const originCode = trList(1);
                 const originName = trList(2);
@@ -89,8 +90,8 @@ const parseHtml = {
     },
     deal(res) {
         const update2017UrlArr = this.getChangeUrl(res);
-        updateUrlArr.push(update2015Url, update2016Url)
-        updateUrlArr = updateUrlArr.concat(update2017UrlArr);
+        updateUrlArr.push(update2016Url, update2015Url);
+        updateUrlArr = update2017UrlArr.concat(updateUrlArr);
         len = updateUrlArr.length;
 
         function loopFn() {
