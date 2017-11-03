@@ -26,6 +26,8 @@
 
 * [中华人民共和国国家统计局>>统计数据](http://www.stats.gov.cn/tjsj/)
 
+* [中华人民共和国国家统计局>>统计用区划和城乡划分代码](http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/)
+
 * [中华人民共和国民政部-服务-政策解答-区划地名](http://www.mca.gov.cn/article/fw/zcjd/qhdm/)
 
 * [地名普查办--系统维护中](http://dmpc.mca.gov.cn/)
